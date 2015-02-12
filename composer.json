@@ -1,0 +1,26 @@
+{
+  "name": "bankiru/bankiru-distribution-bundle",
+  "description": "Distribution preparation",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Boris Gorbylev",
+      "email": "gorbylev@banki.ru"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=5.5.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.5",
+    "composer/composer": "~1.0@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bankiru\\DistributionBundle\\": ["src","tests"]
+    }
+  }
+}
