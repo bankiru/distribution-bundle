@@ -13,13 +13,17 @@ abstract class AbstractHandler
      */
     protected static function getOptions(Event $event)
     {
-        $options = array_merge(
-            [
-            ],
-            $event->getComposer()->getPackage()->getExtra()
-        );
+        static $options;
 
-        $options['process-timeout'] = $event->getComposer()->getConfig()->get('process-timeout');
+        if ($options === null) {
+            $options = array_merge(
+                [
+                ],
+                $event->getComposer()->getPackage()->getExtra()
+            );
+
+            $options['process-timeout'] = $event->getComposer()->getConfig()->get('process-timeout');
+        }
 
         return $options;
     }
