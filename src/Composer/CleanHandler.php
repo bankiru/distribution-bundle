@@ -43,7 +43,7 @@ class CleanHandler extends AbstractHandler
         );
         $verboseFlag = $io->isVerbose() ? 'v' : '';
         $cmd = "find . -depth {$predicates} -exec rm -rf{$verboseFlag} '{}' \\;";
-        self::runProcess($io, $cmd, null, null, null, $options['process-timeout']);
+        self::runProcess($event, $cmd);
         $io->write('VCS metadata removing finished');
     }
 
@@ -65,7 +65,7 @@ class CleanHandler extends AbstractHandler
         $io->write('Tests removing started');
         $verboseFlag = $io->isVerbose() ? 'v' : '';
         $cmd = "find . -depth -type d -name tests -exec rm -rf{$verboseFlag} '{}' \\;";
-        self::runProcess($io, $cmd, null, null, null, $options['process-timeout']);
+        self::runProcess($event, $cmd);
         $io->write('Tests removing finished');
     }
 
@@ -95,7 +95,7 @@ class CleanHandler extends AbstractHandler
         $items = implode(' ', $options['clean-custom']);
         $verboseFlag = $io->isVerbose() ? 'v' : '';
         $cmd = "rm -rf{$verboseFlag} {$items}";
-        self::runProcess($io, $cmd, null, null, null, $options['process-timeout']);
+        self::runProcess($event, $cmd);
         $io->write('Custom files/dirs removing finished');
     }
 

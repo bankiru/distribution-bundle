@@ -1,9 +1,9 @@
 <?php
 namespace Bankiru\DistributionBundle\Composer;
 
-use Composer\IO\IOInterface;
 use Composer\Script\Event;
 use Symfony\Component\Process\Process;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 abstract class AbstractHandler
 {
@@ -25,7 +25,7 @@ abstract class AbstractHandler
     }
 
     /**
-     * @param IOInterface $io
+     * @param Event $event
      * @param $commandline
      * @param null $cwd
      * @param array $env
@@ -35,21 +35,30 @@ abstract class AbstractHandler
      * @return Process
      */
     protected static function runProcess(
-        IOInterface $io,
+        Event $event,
         $commandline,
         $cwd = null,
         array $env = null,
         $input = null,
-        $timeout = 60,
+        $timeout = null,
         array $options = []
     ) {
+        if ($timeout === null) {
+            $timeout = self::getOptions($event)['process-timeout'];
+        }
+
+        $io = $event->getIO();
+
         if ($io->isDebug()) {
             $io->write(sprintf('Executing command: %s', escapeshellarg($commandline)));
         }
 
+        $hideOutput = !empty($options['hide-output']);
+        unset($options['hide-output']);
+
         $process = new Process($commandline, $cwd, $env, $input, $timeout, $options);
-        $process->run(function ($type, $buffer) use ($io) {
-            if ($type == Process::OUT) {
+        $process->run(function ($type, $buffer) use ($io, $hideOutput) {
+            if ($type == Process::OUT && !$hideOutput) {
                 $io->write($buffer);
             }
         });
@@ -61,5 +70,22 @@ abstract class AbstractHandler
             ));
         }
         return $process;
+    }
+
+    protected static function evaluateCondition($condition)
+    {
+        $expressionLanguage = new ExpressionLanguage();
+
+        $expressionLanguage->register(
+            'getenv',
+            function ($envvar) {
+                return sprintf('(is_string(%1$s) ? getenv(%1$s) : false)', $envvar);
+            },
+            function ($arguments, $envvar) {
+                return is_string($envvar) ? getenv($envvar) : false;
+            }
+        );
+
+        return $expressionLanguage->evaluate($condition);
     }
 }
