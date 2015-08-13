@@ -40,6 +40,36 @@ class NodeModuleHandler extends AbstractHandler
         }
     }
 
+    public static function gulp(Event $event)
+    {
+        if (self::isSkip($event, 'gulp')) {
+            return;
+        }
+
+        $options = self::getOptions($event);
+
+        if (!file_exists($options['gulp-work-dir'] . DIRECTORY_SEPARATOR . 'gulpfile.js')) {
+            throw new \RuntimeException(sprintf('File "Gulpfile.js" was not found in directory "%s"', $options['grunt-work-dir']));
+        }
+
+        $args = 'build';
+
+        $process = self::runModule('gulp', $args, $event);
+
+        if ($options['gulp-fail-on-warning']) {
+            // костыль для отлова ворнингов
+            $warnings = array_filter(explode(PHP_EOL, $process->getOutput()), function ($buffer) {
+                return strpos($buffer, "\x1b\x5b\x33\x31\x6d\x3e\x3e\x20") === 0; // две красные угловые стрелки
+            });
+
+            if (!empty($warnings)) {
+                $warnings = implode(', ', array_map(function ($buffer) { substr($buffer, 8); }, $warnings));
+
+                throw new \RuntimeException('gulp generates warnings: ' . $warnings);
+            }
+        }
+    }
+
     /**
      * @param $event Event A instance
      * @throws \RuntimeException
@@ -91,9 +121,11 @@ class NodeModuleHandler extends AbstractHandler
                 [
                     'node_modules-dir'      => './node_modules',
                     'grunt-work-dir'        => '.',
+                    'gulp-work-dir'        => '.',
                     'grunt-run-condition'   => null,
                     'grunt-args'            => ['prod' => 'prod', 'dev' => 'dev'],
                     'grunt-fail-on-warning' => false,
+                    'gulp-fail-on-warning' => false,
                     'bower-work-dir'        => '.',
                     'bower-run-condition'   => null,
                 ],
