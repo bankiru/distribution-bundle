@@ -47,6 +47,8 @@ class NpmHandler extends AbstractHandler
     }
 
     /**
+     * @param string $command npm command name
+     * @param string $args npm command arguments
      * @param $event Event A instance
      * @return Process|null
      * @throws \RuntimeException
@@ -60,6 +62,19 @@ class NpmHandler extends AbstractHandler
         if (!empty($options['npm-run-condition']) && !self::evaluateCondition($options['npm-run-condition'])) {
             $io->write(sprintf('NPM %s skipped because npm-run-condition', $command));
             return null;
+        }
+
+        if (!preg_match('@(^|\s)(-d{1,3}|--verbose|--loglevel|-s|--silent|-q|--quiet)(\s|$)@', $args) && $io->isVerbose()) {
+            $args .= ' -';
+            switch (true) {
+                case $io->isVerbose():
+                    $args .= 'd';
+                case $io->isVeryVerbose():
+                    $args .= 'd';
+                case $io->isDebug():
+                    $args .= 'd';
+            }
+            $args = trim($args);
         }
 
         $io->write(sprintf('NPM %s started', $command));

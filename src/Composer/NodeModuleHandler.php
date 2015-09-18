@@ -24,6 +24,15 @@ class NodeModuleHandler extends AbstractHandler
 
         $args = $options['grunt-args'][$event->isDevMode() ? 'dev' : 'prod'];
 
+        if (!preg_match('@(^|\s)(-v|--verbose|-d|--debug)(\s|$)@', $args) && $event->getIO()->isVerbose()) {
+            if ($event->getIO()->isDebug()) {
+                $args .= ' --debug';
+            } else {
+                $args .= ' --verbose';
+            }
+            $args = trim($args);
+        }
+
         $process = self::runModule('grunt', $args, $event);
 
         if ($options['grunt-fail-on-warning']) {
@@ -76,7 +85,7 @@ class NodeModuleHandler extends AbstractHandler
      */
     public static function bowerInstall(Event $event)
     {
-        self::bowerRun($event, 'install');
+        self::bower($event, 'install');
     }
 
     /**
@@ -85,7 +94,7 @@ class NodeModuleHandler extends AbstractHandler
      */
     public static function bowerUpdate(Event $event)
     {
-        self::bowerRun($event, 'install');
+        self::bower($event, 'install');
     }
 
     /**
@@ -93,7 +102,7 @@ class NodeModuleHandler extends AbstractHandler
      * @return Process
      * @throws \RuntimeException
      */
-    private static function bowerRun(Event $event, $args)
+    private static function bower(Event $event, $args)
     {
         if (self::isSkip($event, 'bower')) {
             return null;
@@ -103,6 +112,10 @@ class NodeModuleHandler extends AbstractHandler
 
         if (!file_exists($options['bower-work-dir'] . DIRECTORY_SEPARATOR . 'bower.json')) {
             throw new \RuntimeException(sprintf('File "bower.json" was not found in directory "%s"', $options['bower-work-dir']));
+        }
+
+        if (!preg_match('@(^|\s)(-V|--verbose|-s|--silent|-q|--quiet)(\s|$)@', $args) && $event->getIO()->isVerbose()) {
+            $args = trim($args . ' --verbose');
         }
 
         return self::runModule('bower', $args, $event);
