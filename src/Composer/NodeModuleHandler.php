@@ -58,10 +58,10 @@ class NodeModuleHandler extends AbstractHandler
         $options = self::getOptions($event);
 
         if (!file_exists($options['gulp-work-dir'] . DIRECTORY_SEPARATOR . 'gulpfile.js')) {
-            throw new \RuntimeException(sprintf('File "Gulpfile.js" was not found in directory "%s"', $options['grunt-work-dir']));
+            throw new \RuntimeException(sprintf('File "Gulpfile.js" was not found in directory "%s"', $options['gulp-work-dir']));
         }
 
-        $args = 'build';
+        $args = $options['gulp-args'][$event->isDevMode() ? 'dev' : 'prod'];
 
         $process = self::runModule('gulp', $args, $event);
 
@@ -137,6 +137,7 @@ class NodeModuleHandler extends AbstractHandler
                     'gulp-work-dir'        => '.',
                     'grunt-run-condition'   => null,
                     'grunt-args'            => ['prod' => 'prod', 'dev' => 'dev'],
+                    'gulp-args'             => ['prod' => 'prod', 'dev' => 'dev'],
                     'grunt-fail-on-warning' => false,
                     'gulp-fail-on-warning' => false,
                     'bower-work-dir'        => '.',
