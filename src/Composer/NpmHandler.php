@@ -7,7 +7,8 @@ use Symfony\Component\Process\Process;
 class NpmHandler extends AbstractHandler
 {
     /**
-     * @param $event Event A instance
+     * @param Event $event An Event instance
+     *
      * @throws \RuntimeException
      */
     public static function install(Event $event)
@@ -16,7 +17,8 @@ class NpmHandler extends AbstractHandler
     }
 
     /**
-     * @param $event Event A instance
+     * @param Event $event An Event instance
+     *
      * @throws \RuntimeException
      */
     public static function update(Event $event)
@@ -26,6 +28,7 @@ class NpmHandler extends AbstractHandler
 
     /**
      * @param Event $event
+     *
      * @return array
      */
     protected static function getOptions(Event $event)
@@ -48,10 +51,12 @@ class NpmHandler extends AbstractHandler
 
     /**
      * @param string $command npm command name
-     * @param string $args npm command arguments
-     * @param $event Event A instance
-     * @return Process|null
+     * @param string $args    npm command arguments
+     * @param Event  $event   An Event instance
+     *
      * @throws \RuntimeException
+     *
+     * @return Process|null
      */
     private static function runCommand($command, $args = '', Event $event)
     {
@@ -61,7 +66,8 @@ class NpmHandler extends AbstractHandler
 
         if (!empty($options['npm-run-condition']) && !self::evaluateCondition($options['npm-run-condition'])) {
             $io->write(sprintf('NPM %s skipped because npm-run-condition', $command));
-            return null;
+
+            return;
         }
 
         if (!preg_match('@(^|\s)(-d{1,3}|--verbose|--loglevel|-s|--silent|-q|--quiet)(\s|$)@', $args) && $io->isVerbose()) {
@@ -80,21 +86,26 @@ class NpmHandler extends AbstractHandler
         $io->write(sprintf('NPM %s started', $command));
 
         $commandline = trim(self::findNpmBin($event) . ' ' . $command . ' ' . $args);
-        $process = self::runProcess($event, $commandline, $options['npm-work-dir']);
+        $process     = self::runProcess($event, $commandline, $options['npm-work-dir']);
 
         $io->write(sprintf('NPM %s finished', $command));
 
         return $process;
     }
 
+    /**
+     * @param Event $event
+     *
+     * @return string
+     */
     private static function findNpmBin(Event $event)
     {
         try {
             $process = self::runProcess($event, 'which npm', getcwd(), null, null, null, ['hide-output' => true]);
+
             return trim($process->getOutput());
         } catch (\RuntimeException $ex) {
             throw new \RuntimeException('Can not find NPM binary: ' . $ex->getMessage());
         }
     }
-
 }

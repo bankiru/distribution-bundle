@@ -6,7 +6,8 @@ use Composer\Script\Event;
 class CleanHandler extends AbstractHandler
 {
     /**
-     * @param $event Event A instance
+     * @param Event  $event  An Event instance
+     *
      * @throws \RuntimeException
      */
     public static function cleanAll(Event $event)
@@ -17,7 +18,8 @@ class CleanHandler extends AbstractHandler
     }
 
     /**
-     * @param $event Event A instance
+     * @param Event  $event  An Event instance
+     *
      * @throws \RuntimeException
      */
     public static function cleanVcsMeta(Event $event)
@@ -28,6 +30,7 @@ class CleanHandler extends AbstractHandler
 
         if ($event->isDevMode() && !$options['clean-in-dev']) {
             $io->write('VCS metadata removing skipped in dev mode');
+
             return;
         }
 
@@ -42,13 +45,14 @@ class CleanHandler extends AbstractHandler
             )
         );
         $verboseFlag = $io->isVerbose() ? 'v' : '';
-        $cmd = "find . -depth {$predicates} -exec rm -rf{$verboseFlag} '{}' \\;";
+        $cmd         = "find . -depth {$predicates} -exec rm -rf{$verboseFlag} '{}' \\;";
         self::runProcess($event, $cmd);
         $io->write('VCS metadata removing finished');
     }
 
     /**
-     * @param $event Event A instance
+     * @param Event  $event  An Event instance
+     *
      * @throws \RuntimeException
      */
     public static function cleanTests(Event $event)
@@ -59,18 +63,20 @@ class CleanHandler extends AbstractHandler
 
         if ($event->isDevMode() && !$options['clean-in-dev']) {
             $io->write('Tests removing skipped in dev mode');
+
             return;
         }
 
         $io->write('Tests removing started');
         $verboseFlag = $io->isVerbose() ? 'v' : '';
-        $cmd = "find . -depth -type d -name tests -exec rm -rf{$verboseFlag} '{}' \\;";
+        $cmd         = "find . -depth -type d -name tests -exec rm -rf{$verboseFlag} '{}' \\;";
         self::runProcess($event, $cmd);
         $io->write('Tests removing finished');
     }
 
     /**
-     * @param $event Event A instance
+     * @param Event  $event  An Event instance
+     *
      * @throws \RuntimeException
      */
     public static function cleanCustom(Event $event)
@@ -83,33 +89,36 @@ class CleanHandler extends AbstractHandler
             if ($io->isVerbose()) {
                 $io->write('Custom files/dirs removing skipped because empty');
             }
+
             return;
         }
 
         if ($event->isDevMode() && !$options['clean-in-dev']) {
             $io->write('Custom files/dirs removing skipped in dev mode');
+
             return;
         }
 
         $io->write('Custom files/dirs removing started');
-        $items = implode(' ', $options['clean-custom']);
+        $items       = implode(' ', $options['clean-custom']);
         $verboseFlag = $io->isVerbose() ? 'v' : '';
-        $cmd = "rm -rf{$verboseFlag} {$items}";
+        $cmd         = "rm -rf{$verboseFlag} {$items}";
         self::runProcess($event, $cmd);
         $io->write('Custom files/dirs removing finished');
     }
 
     /**
      * @param Event $event
+     *
      * @return array
      */
     protected static function getOptions(Event $event)
     {
         $options = array_merge(
             [
-                'clean-custom' => null,
-                'clean-in-dev' => false,
-                'clean-vcs-meta-patterns' => ['.git*', '.hg*', '.svn*', '.cvs*']
+                'clean-custom'            => null,
+                'clean-in-dev'            => false,
+                'clean-vcs-meta-patterns' => ['.git*', '.hg*', '.svn*', '.cvs*'],
             ],
             parent::getOptions($event)
         );

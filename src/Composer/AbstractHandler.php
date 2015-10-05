@@ -2,13 +2,14 @@
 namespace Bankiru\DistributionBundle\Composer;
 
 use Composer\Script\Event;
-use Symfony\Component\Process\Process;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\Process\Process;
 
 abstract class AbstractHandler
 {
     /**
      * @param Event $event
+     *
      * @return array
      */
     protected static function getOptions(Event $event)
@@ -31,11 +32,12 @@ abstract class AbstractHandler
     /**
      * @param Event $event
      * @param $commandline
-     * @param null $cwd
+     * @param null  $cwd
      * @param array $env
-     * @param null $input
-     * @param int $timeout
+     * @param null  $input
+     * @param int   $timeout
      * @param array $options
+     *
      * @return Process
      */
     protected static function runProcess(
@@ -73,6 +75,7 @@ abstract class AbstractHandler
                 PHP_EOL . "\t" . $process->getErrorOutput()
             ));
         }
+
         return $process;
     }
 

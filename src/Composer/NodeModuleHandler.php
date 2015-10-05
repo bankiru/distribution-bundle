@@ -7,7 +7,8 @@ use Symfony\Component\Process\Process;
 class NodeModuleHandler extends AbstractHandler
 {
     /**
-     * @param $event Event A instance
+     * @param Event $event An Event instance
+     *
      * @throws \RuntimeException
      */
     public static function grunt(Event $event)
@@ -49,6 +50,11 @@ class NodeModuleHandler extends AbstractHandler
         }
     }
 
+    /**
+     * @param Event $event An Event instance
+     *
+     * @throws \RuntimeException
+     */
     public static function gulp(Event $event)
     {
         if (self::isSkip($event, 'gulp')) {
@@ -81,6 +87,7 @@ class NodeModuleHandler extends AbstractHandler
 
     /**
      * @param $event Event A instance
+     *
      * @throws \RuntimeException
      */
     public static function bowerInstall(Event $event)
@@ -89,7 +96,8 @@ class NodeModuleHandler extends AbstractHandler
     }
 
     /**
-     * @param $event Event A instance
+     * @param Event $event An Event instance
+     *
      * @throws \RuntimeException
      */
     public static function bowerUpdate(Event $event)
@@ -98,14 +106,16 @@ class NodeModuleHandler extends AbstractHandler
     }
 
     /**
-     * @param $event Event A instance
-     * @return Process
+     * @param Event $event An Event instance
+     *
      * @throws \RuntimeException
+     * @return Process
+     *
      */
     private static function bower(Event $event, $args)
     {
         if (self::isSkip($event, 'bower')) {
-            return null;
+            return;
         }
 
         $options = self::getOptions($event);
@@ -122,7 +132,8 @@ class NodeModuleHandler extends AbstractHandler
     }
 
     /**
-     * @param Event $event
+     * @param Event $event An Event instance
+     *
      * @return array
      */
     protected static function getOptions(Event $event)
@@ -133,15 +144,16 @@ class NodeModuleHandler extends AbstractHandler
             $options = array_merge(
                 [
                     'node_modules-dir'      => './node_modules',
-                    'grunt-work-dir'        => '.',
-                    'gulp-work-dir'        => '.',
-                    'grunt-run-condition'   => null,
-                    'grunt-args'            => ['prod' => 'prod', 'dev' => 'dev'],
-                    'gulp-args'             => ['prod' => 'prod', 'dev' => 'dev'],
-                    'grunt-fail-on-warning' => false,
-                    'gulp-fail-on-warning' => false,
                     'bower-work-dir'        => '.',
                     'bower-run-condition'   => null,
+                    'grunt-work-dir'        => '.',
+                    'grunt-run-condition'   => null,
+                    'grunt-args'            => ['prod' => 'prod', 'dev' => 'dev'],
+                    'grunt-fail-on-warning' => false,
+                    'gulp-work-dir'         => '.',
+                    'gulp-run-condition'    => null,
+                    'gulp-args'             => ['prod' => 'prod', 'dev' => 'dev'],
+                    'gulp-fail-on-warning'  => false,
                 ],
                 parent::getOptions($event)
             );
@@ -151,9 +163,11 @@ class NodeModuleHandler extends AbstractHandler
     }
 
     /**
-     * @param $event Event A instance
-     * @return Process|null
+     * @param Event $event An Event instance
+     *
      * @throws \RuntimeException
+     * @return Process|null
+     *
      */
     private static function runModule($module, $args = '', Event $event)
     {
@@ -172,7 +186,7 @@ class NodeModuleHandler extends AbstractHandler
         }
 
         $commandline = trim(self::findBin($options['node_modules-dir'], $module) . ' ' . $args);
-        $process = self::runProcess($event, $commandline, $options[$module . '-work-dir']);
+        $process     = self::runProcess($event, $commandline, $options[$module . '-work-dir']);
 
         $io->write(sprintf('Node module %s finished', $module));
 
@@ -182,6 +196,7 @@ class NodeModuleHandler extends AbstractHandler
     /**
      * @param string $nodeModulesDir
      * @param string $module
+     *
      * @return string
      */
     private static function findBin($nodeModulesDir, $module)
@@ -208,8 +223,9 @@ class NodeModuleHandler extends AbstractHandler
     }
 
     /**
-     * @param Event $event
+     * @param Event  $event  An Event instance
      * @param string $module
+     *
      * @return bool
      */
     private static function isSkip(Event $event, $module)
@@ -220,6 +236,7 @@ class NodeModuleHandler extends AbstractHandler
 
         if (!empty($options[$module . '-run-condition']) && !self::evaluateCondition($options[$module . '-run-condition'])) {
             $io->write(sprintf('Node module %s skipped because %s-run-condition', $module, $module));
+
             return true;
         }
 
