@@ -42,7 +42,7 @@ class NodeModuleHandler extends AbstractHandler
                 return strpos($buffer, "\x1b\x5b\x33\x31\x6d\x3e\x3e\x20") === 0; // две красные угловые стрелки
             });
 
-            if (0 === count($warnings)) {
+            if (0 !== count($warnings)) {
                 $warnings = implode(', ', array_map(function ($buffer) { return substr($buffer, 8); }, $warnings));
 
                 throw new \RuntimeException('grunt generates warnings: ' . $warnings);
@@ -77,7 +77,7 @@ class NodeModuleHandler extends AbstractHandler
                 return strpos($buffer, "\x1b\x5b\x33\x31\x6d\x3e\x3e\x20") === 0; // две красные угловые стрелки
             });
 
-            if (0 === count($warnings)) {
+            if (0 !== count($warnings)) {
                 $warnings = implode(', ', array_map(function ($buffer) { return substr($buffer, 8); }, $warnings));
 
                 throw new \RuntimeException('gulp generates warnings: ' . $warnings);
@@ -115,7 +115,7 @@ class NodeModuleHandler extends AbstractHandler
     private static function bower(Event $event, $args)
     {
         if (self::isSkip($event, 'bower')) {
-            return;
+            return null;
         }
 
         $options = self::getOptions($event);
