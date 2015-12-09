@@ -45,7 +45,7 @@ class CleanHandler extends AbstractHandler
             )
         );
         $verboseFlag = $io->isVerbose() ? 'v' : '';
-        $cmd         = "find . -depth {$predicates} -exec rm -rf{$verboseFlag} '{}' \\;";
+        $cmd         = "find . -depth {$predicates} | xargs -n 5 -I {} rm -rf{$verboseFlag} {}";
         self::runProcess($event, $cmd);
         $io->write('VCS metadata removing finished');
     }
@@ -69,7 +69,7 @@ class CleanHandler extends AbstractHandler
 
         $io->write('Tests removing started');
         $verboseFlag = $io->isVerbose() ? 'v' : '';
-        $cmd         = "find . -depth -type d -name tests -exec rm -rf{$verboseFlag} '{}' \\;";
+        $cmd         = "find . -depth -type d -name tests | xargs -n 5 -I {} rm -rf{$verboseFlag} {}";
         self::runProcess($event, $cmd);
         $io->write('Tests removing finished');
     }
