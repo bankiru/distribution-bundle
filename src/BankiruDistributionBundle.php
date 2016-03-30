@@ -1,4 +1,5 @@
 <?php
+
 namespace Bankiru\DistributionBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
