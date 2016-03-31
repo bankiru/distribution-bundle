@@ -22,14 +22,17 @@
     "fabpot/php-cs-fixer": "^1.0",
     "codeception/aspect-mock": "^1.0"
   },
-  "scripts": {
-    "fix-csc": [
-      "php-cs-fixer fix -vvv src; exit 0"
-    ]
-  },
   "autoload": {
     "psr-4": {
       "Bankiru\\DistributionBundle\\": ["src","tests"]
     }
+  },
+  "scripts": {
+    "csc-check": [
+      "php-cs-fixer fix -vvv --dry-run"
+    ],
+    "csc-fix": [
+      "php-cs-fixer fix -vvv; exit 0"
+    ]
   }
 }
